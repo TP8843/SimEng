@@ -8733,7 +8733,8 @@ void Instruction::execute() {
         break;
       }
       case Opcode::AArch64_XPACLRI: {  // xpaclri
-        // SimEng doesn't support PAC, so do nothing
+        // SimEng doesn't support PAC; x30 is left unmodified
+        results_[0] = {sourceValues_[0].get<uint64_t>(), 8};
         break;
       }
       case Opcode::AArch64_XTNv2i32: {  // xtn vd.2s, vn.2d
