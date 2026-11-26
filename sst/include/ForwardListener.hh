@@ -66,14 +66,14 @@ class CacheListenerEvent : public SST::Event {
  public:
   void serialize_order(SST::Core::Serialization::serializer& ser) override {
     Event::serialize_order(ser);
-    ser & size;
-    ser & targAddr;
-    ser & physAddr;
-    ser & virtAddr;
-    ser & instPtr;
-    ser & access;
-    ser & result;
-    ser & fromL2;
+    SST_SER(size);
+    SST_SER(targAddr);
+    SST_SER(physAddr);
+    SST_SER(virtAddr);
+    SST_SER(instPtr);
+    SST_SER(access);
+    SST_SER(result);
+    SST_SER(fromL2);
   }
 
   ImplementSerializable(CacheListenerEvent);

@@ -42,7 +42,7 @@ class ControlEvent : public SST::Event {
  public:
   void serialize_order(SST::Core::Serialization::serializer& ser) override {
     Event::serialize_order(ser);
-    ser & clearPFQ_;
+    SST_SER(clearPFQ_);
   }
 
   ImplementSerializable(ControlEvent);
