@@ -839,7 +839,7 @@ class SimEngNOC : public nocAPI {
    * during instantiation using the registerClock method provided
    * by SST.
    */
-  TimeConverter* clock_;
+  TimeConverter clock_;
 
   /** SST::SimpleNetwork interface to the linked network. */
   SST::Interfaces::SimpleNetwork* interface_;

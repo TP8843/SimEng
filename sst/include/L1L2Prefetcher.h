@@ -176,7 +176,7 @@ class L1L2Prefetcher : public SST::Component {
    * during instantiation using the registerClock method provided
    * by SST.
    */
-  TimeConverter* clock_;
+  TimeConverter clock_;
 
   void handleFromPrefetchEvent(Event* ev);
   void handleFromCacheEvent(Event* ev);
