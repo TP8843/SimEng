@@ -19,7 +19,7 @@ SimOSWrapper::SimOSWrapper(SST::ComponentId_t id, SST::Params& params)
                SST::Output::STDOUT);
   clock_ = registerClock(
       params.find<std::string>("clock", "1GHz"),
-      new SST::Clock::Handler<SimOSWrapper>(this, &SimOSWrapper::clockTick));
+      new SST::Clock::Handler<SimOSWrapper, &SimOSWrapper::clockTick>(this));
 
   // Extract remaining variables from config.py
   numCores_ = params.find<uint16_t>("num_cores", "1");
@@ -42,14 +42,14 @@ SimOSWrapper::SimOSWrapper(SST::ComponentId_t id, SST::Params& params)
   output_.verbose(CALL_INFO, 1, 0, "Declare dataInterface_\n");
   dataInterface_ = loadUserSubComponent<SST::Interfaces::StandardMem>(
       "dataMemory", ComponentInfo::SHARE_NONE, clock_,
-      new StandardMem::Handler<SimOSWrapper>(this,
-                                             &SimOSWrapper::handleMemoryEvent));
+      new StandardMem::Handler<SimOSWrapper, &SimOSWrapper::handleMemoryEvent>(
+          this));
 
   output_.verbose(CALL_INFO, 1, 0, "Declare instrInterface_\n");
   instrInterface_ = loadUserSubComponent<SST::Interfaces::StandardMem>(
       "instrMemory", ComponentInfo::SHARE_NONE, clock_,
-      new StandardMem::Handler<SimOSWrapper>(this,
-                                             &SimOSWrapper::handleMemoryEvent));
+      new StandardMem::Handler<SimOSWrapper, &SimOSWrapper::handleMemoryEvent>(
+          this));
 
   output_.verbose(CALL_INFO, 1, 0, "Declare memInterface_\n");
   memInterface_ = std::make_shared<SimEngMemInterface>(
@@ -62,8 +62,9 @@ SimOSWrapper::SimOSWrapper(SST::ComponentId_t id, SST::Params& params)
   // Instantiate the NOC
   output_.verbose(CALL_INFO, 1, 0, "Declare noc_\n");
   sstNoc_ = loadUserSubComponent<nocAPI>("noc");
-  sstNoc_->setRecvNotifyHandler(new Event::Handler<SimOSWrapper>(
-      this, &SimOSWrapper::handleNetworkEvent));
+  sstNoc_->setRecvNotifyHandler(
+      new Event::Handler<SimOSWrapper, &SimOSWrapper::handleNetworkEvent>(
+          this));
 
   // Protected methods from SST::Component used to start simulation
   registerAsPrimaryComponent();

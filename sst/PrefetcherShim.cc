@@ -29,9 +29,10 @@ PrefetcherShim::PrefetcherShim(ComponentId_t id, Params& params)
   output->output(CALL_INFO,
                  "Configuring port with shouldForward: %d, isL2: %d\n",
                  shouldForward, isL2);
-  toPrefetcher = configureLink(std::string("to_prefetcher_link"), "1ps",
-                               new Event::Handler<PrefetcherShim>(
-                                   this, &PrefetcherShim::recvPrefetchRequest));
+  toPrefetcher = configureLink(
+      std::string("to_prefetcher_link"), "1ps",
+      new Event::Handler<PrefetcherShim, &PrefetcherShim::recvPrefetchRequest>(
+          this));
 
   output->output(CALL_INFO, "To prefetcher Port %d\n", toPrefetcher->getId());
 }

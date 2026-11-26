@@ -29,9 +29,10 @@ L1L2Prefetcher::L1L2Prefetcher(SST::ComponentId_t id, SST::Params& params)
   // until one isn't found
   while (true) {
     std::string linkName = "from_prefetch_link_" + std::to_string(fromPRF);
-    link = configureLink(linkName, "1ps",
-                         new Event::Handler<L1L2Prefetcher>(
-                             this, &L1L2Prefetcher::handleFromPrefetchEvent));
+    link = configureLink(
+        linkName, "1ps",
+        new Event::Handler<L1L2Prefetcher,
+                           &L1L2Prefetcher::handleFromPrefetchEvent>(this));
     if (link) {
       fromPRF_links.push_back(link);
       output->output(CALL_INFO, "From Prefetch Port %d = Link %d\n",
@@ -52,9 +53,10 @@ L1L2Prefetcher::L1L2Prefetcher(SST::ComponentId_t id, SST::Params& params)
   int fromCache = 0;
   while (true) {
     std::string linkName = "from_cache_link_" + std::to_string(fromCache);
-    link = configureLink(linkName, "1ps",
-                         new Event::Handler<L1L2Prefetcher>(
-                             this, &L1L2Prefetcher::handleFromCacheEvent));
+    link = configureLink(
+        linkName, "1ps",
+        new Event::Handler<L1L2Prefetcher,
+                           &L1L2Prefetcher::handleFromCacheEvent>(this));
     if (link) {
       fromCache_links.push_back(link);
       output->output(CALL_INFO, "From Cache Port %d = Link %d\n", link->getId(),
@@ -71,10 +73,10 @@ L1L2Prefetcher::L1L2Prefetcher(SST::ComponentId_t id, SST::Params& params)
         "Did not find any connected links on ports from_cache_link_n\n");
 
   // Configure link to processor
-  fromCore_link =
-      configureLink(std::string("from_core_link"), "1ps",
-                    new Event::Handler<L1L2Prefetcher>(
-                        this, &L1L2Prefetcher::handleFromProcessorEvent));
+  fromCore_link = configureLink(
+      std::string("from_core_link"), "1ps",
+      new Event::Handler<L1L2Prefetcher,
+                         &L1L2Prefetcher::handleFromProcessorEvent>(this));
   if (!fromCore_link) {
     output->fatal(CALL_INFO, -1,
                   "Did not find any connected links on port fromCore_link\n");

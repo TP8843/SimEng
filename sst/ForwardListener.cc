@@ -23,9 +23,10 @@ ForwardListener::ForwardListener(ComponentId_t id, Params& params)
   output->output(CALL_INFO, "Configuring Link\n");
 
   // Configure link to Prefetcher
-  forwardLink = configureLink(std::string("forward_link"), "1ps",
-                              new Event::Handler<ForwardListener>(
-                                  this, &ForwardListener::recvLinkEvent));
+  forwardLink = configureLink(
+      std::string("forward_link"), "1ps",
+      new Event::Handler<ForwardListener, &ForwardListener::recvLinkEvent>(
+          this));
   if (!forwardLink) {
     output->fatal(CALL_INFO, -1,
                   "Did not find any connected links on port forward_link\n");

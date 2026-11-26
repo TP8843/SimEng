@@ -18,9 +18,10 @@ SimEngCoreWrapper::SimEngCoreWrapper(SST::ComponentId_t id, SST::Params& params)
     : SST::Component(id), fromCacheListener(nullptr) {
   output_.init("[SSTSimEng:SimEngCoreWrapper:" + getName() + "] @p:@l ", 999, 0,
                SST::Output::STDOUT);
-  clock_ = registerClock(params.find<std::string>("clock", "1GHz"),
-                         new SST::Clock::Handler<SimEngCoreWrapper>(
-                             this, &SimEngCoreWrapper::clockTick));
+  clock_ = registerClock(
+      params.find<std::string>("clock", "1GHz"),
+      new SST::Clock::Handler<SimEngCoreWrapper, &SimEngCoreWrapper::clockTick>(
+          this));
 
   // Extract variables from config.py
   simengConfigPath_ = params.find<std::string>("simeng_config_path", "");
@@ -42,14 +43,14 @@ SimEngCoreWrapper::SimEngCoreWrapper(SST::ComponentId_t id, SST::Params& params)
   output_.verbose(CALL_INFO, 1, 0, "Declare dataInterface_\n");
   dataInterface_ = loadUserSubComponent<SST::Interfaces::StandardMem>(
       "dataMemory", ComponentInfo::SHARE_NONE, clock_,
-      new StandardMem::Handler<SimEngCoreWrapper>(
-          this, &SimEngCoreWrapper::handleMemoryEvent));
+      new StandardMem::Handler<SimEngCoreWrapper,
+                               &SimEngCoreWrapper::handleMemoryEvent>(this));
 
   output_.verbose(CALL_INFO, 1, 0, "Declare instrInterface_\n");
   instrInterface_ = loadUserSubComponent<SST::Interfaces::StandardMem>(
       "instrMemory", ComponentInfo::SHARE_NONE, clock_,
-      new StandardMem::Handler<SimEngCoreWrapper>(
-          this, &SimEngCoreWrapper::handleMemoryEvent));
+      new StandardMem::Handler<SimEngCoreWrapper,
+                               &SimEngCoreWrapper::handleMemoryEvent>(this));
 
   output_.verbose(CALL_INFO, 1, 0, "Declare memInterface_\n");
   memInterface_ = std::make_shared<SimEngMemInterface>(
@@ -62,15 +63,16 @@ SimEngCoreWrapper::SimEngCoreWrapper(SST::ComponentId_t id, SST::Params& params)
   // Instantiate the NOC
   output_.verbose(CALL_INFO, 1, 0, "Declare noc_\n");
   sstNoc_ = loadUserSubComponent<nocAPI>("noc");
-  sstNoc_->setRecvNotifyHandler(new Event::Handler<SimEngCoreWrapper>(
-      this, &SimEngCoreWrapper::handleNetworkEvent));
+  sstNoc_->setRecvNotifyHandler(
+      new Event::Handler<SimEngCoreWrapper,
+                         &SimEngCoreWrapper::handleNetworkEvent>(this));
 
   // Instantiate the cache listener port
   output_.verbose(CALL_INFO, 1, 0, "Configure cache listener link\n");
-  fromCacheListener =
-      configureLink(std::string("from_cache_listener_link"), "1ps",
-                    new Event::Handler<SimEngCoreWrapper>(
-                        this, &SimEngCoreWrapper::recvCacheListenerEvent));
+  fromCacheListener = configureLink(
+      std::string("from_cache_listener_link"), "1ps",
+      new Event::Handler<SimEngCoreWrapper,
+                         &SimEngCoreWrapper::recvCacheListenerEvent>(this));
   if (!fromCacheListener) {
     output_.fatal(
         CALL_INFO, -1,
@@ -79,10 +81,10 @@ SimEngCoreWrapper::SimEngCoreWrapper(SST::ComponentId_t id, SST::Params& params)
 
   // Instantiate the cache prefetcher port
   output_.verbose(CALL_INFO, 1, 0, "Configure cache prefetcher link\n");
-  fromCachePrefetcher =
-      configureLink(std::string("from_prefetcher_link"), "1ps",
-                    new Event::Handler<SimEngCoreWrapper>(
-                        this, &SimEngCoreWrapper::recvCachePrefetcherEvent));
+  fromCachePrefetcher = configureLink(
+      std::string("from_prefetcher_link"), "1ps",
+      new Event::Handler<SimEngCoreWrapper,
+                         &SimEngCoreWrapper::recvCachePrefetcherEvent>(this));
   if (!fromCachePrefetcher) {
     output_.fatal(
         CALL_INFO, -1,

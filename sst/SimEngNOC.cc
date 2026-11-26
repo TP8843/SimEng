@@ -8,16 +8,15 @@ SimEngNOC::SimEngNOC(ComponentId_t id, Params& params) : nocAPI(id, params) {
                SST::Output::STDOUT);
   clock_ = registerClock(
       params.find<std::string>("clock", "1GHz"),
-      new SST::Clock::Handler<SimEngNOC>(this, &SimEngNOC::clockTick));
+      new SST::Clock::Handler<SimEngNOC, &SimEngNOC::clockTick>(this));
   // Args for merlin.linkcontrol (which inherits from
   // SST::Interfaces::SimpleNetwork) is just the number of virtual netwroks, set
   // to 1 here
   interface_ = loadUserSubComponent<SST::Interfaces::SimpleNetwork>(
       "interface", SST::ComponentInfo::SHARE_NONE, 1);
 
-  interface_->setNotifyOnReceive(
-      new SST::Interfaces::SimpleNetwork::Handler<SimEngNOC>(
-          this, &SimEngNOC::recvNotify));
+  interface_->setNotifyOnReceive(new SST::Interfaces::SimpleNetwork::Handler<
+                                 SimEngNOC, &SimEngNOC::recvNotify>(this));
 }
 
 SimEngNOC::~SimEngNOC() {}
