@@ -18,8 +18,8 @@ SimEngCoreWrapper::SimEngCoreWrapper(SST::ComponentId_t id, SST::Params& params)
   output_.init("[SSTSimEng:SimEngCoreWrapper] " + getName() + ":@p:@l ", 999, 0,
                SST::Output::STDOUT);
   clock_ = registerClock(params.find<std::string>("clock", "1GHz"),
-                         new SST::Clock::Handler<SimEngCoreWrapper>(
-                             this, &SimEngCoreWrapper::clockTick));
+                         new SST::Clock::Handler<SimEngCoreWrapper, &SimEngCoreWrapper::clockTick>(
+                             this));
 
   // Extract variables from config.py
   executablePath_ = params.find<std::string>("executable_path", "");
@@ -48,8 +48,8 @@ SimEngCoreWrapper::SimEngCoreWrapper(SST::ComponentId_t id, SST::Params& params)
   // Instantiate the StandardMem Interface defined in config.py
   sstMem_ = loadUserSubComponent<SST::Interfaces::StandardMem>(
       "memory", ComponentInfo::SHARE_NONE, clock_,
-      new StandardMem::Handler<SimEngCoreWrapper>(
-          this, &SimEngCoreWrapper::handleMemoryEvent));
+      new StandardMem::Handler<SimEngCoreWrapper, &SimEngCoreWrapper::handleMemoryEvent>(
+          this));
 
   dataMemory_ = std::make_shared<SimEngMemInterface>(sstMem_, cacheLineWidth_,
                                                      maxAddrMemory_, debug_);

@@ -167,7 +167,7 @@ class SimEngCoreWrapper : public SST::Component {
    * during instantiation using the registerClock method provided
    * by SST.
    */
-  TimeConverter* clock_;
+  TimeConverter clock_;
 
   /**
    * SST::Interfaces::StandardMem interface responsible for converting
