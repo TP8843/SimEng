@@ -3,7 +3,7 @@ Building SimEng with SST
 
 Prerequisites
 *************
-In addition to CMake and a compiler that supports C++17, version **12.0.x** of SST-Core and SST-Elements are required.
+In addition to CMake and a compiler that supports C++17, version **16.0.x** of SST-Core and SST-Elements are required.
 
 .. warning::
     Please ensure that while installing SST-Elements, the initial configuration step should include the
